@@ -13,10 +13,16 @@ module VCCSystem
     attr_accessor :debug
     attr_accessor :project_guid
 
-    AGENT_ADD_STATUS = {
+    AGENT_ADD_ERRORS = {
       "1" => "Failed to add agent",
       "2" => "Permission denied",
       "4" => "Number of agents exceeded"
+    }
+
+    AGENT_LIST_ERRORS = {
+    }
+
+    AGENT_DEL_ERRORS = {
     }
 
     def initialize(project_guid, *args)
@@ -50,7 +56,40 @@ module VCCSystem
       if parsed[:status] == "0"
         parsed[:items].first
       else
-        raise AGENT_ADD_STATUS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
+        raise AGENT_ADD_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
+      end
+    end
+
+    def vcc_agent_list
+      response = self.execute __method__, project_guid: self.project_guid
+      extract = { item: %w(exten crmname agent_type project_guid crm_id project_name) }
+
+      parsed = begin
+        self.parse_response!(response, extract, :xml)
+      rescue RuntimeError => e
+        raise "Invalid response for #{__method__} (#{e.message})"
+      end
+
+      if parsed[:status] == "0"
+        parsed[:items]
+      else
+        raise AGENT_LIST_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
+      end
+    end
+
+    def vcc_agent_del(vcc_id)
+      response = self.execute __method__, project_guid: self.project_guid, vcc_id: vcc_id
+
+      parsed = begin
+        self.parse_response!(response, nil, :xml)
+      rescue RuntimeError => e
+        raise "Invalid response for #{__method__} (#{e.message})"
+      end
+
+      if parsed[:status] == "0"
+        true
+      else
+        raise AGENT_DEL_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
       end
     end
 
@@ -75,11 +114,18 @@ module VCCSystem
       response
     end
 
+    def extract_xml_element_content(element)
+      element = element.first if element.instance_of? Array
+      element = element.first if element.instance_of? Nokogiri::XML::NodeSet
+      return unless element.instance_of? Nokogiri::XML::Element
+      element.content
+    end
+
     def extract_xml_item(item, extract)
       if extract.instance_of? Array
-        Hash[extract.map { |k| [k, item.xpath(k)] }]
+        Hash[extract.map { |k| [ k, self.extract_xml_element_content(item.xpath(k)) ] }]
       else
-        item.content
+        self.extract_xml_element_content(item.content)
       end
     end
 
@@ -93,7 +139,9 @@ module VCCSystem
       end
 
       items = xml.xpath("//root/response/item")
-      parsed[:items] = items.map { |item| self.extract_xml_item(item, extract) }
+      extract_item = extract.instance_of?(Hash) ? extract[:item] : nil
+
+      parsed[:items] = items.map { |item| self.extract_xml_item(item, extract_item) }
 
       parsed
     end

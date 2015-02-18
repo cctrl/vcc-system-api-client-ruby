@@ -12,13 +12,32 @@ RSpec.describe VCCSystem::APIClient do
     VCCSystem::APIClient.new(project_guid, debug: true)
   end
 
-  context "all agents allocated" do
-    describe "#vcc_agent_list" do
+  describe "#vcc_agent_list" do
+    let(:agents) do
+      client.vcc_agent_list()
+    end
+
+    context "all agents allocated" do
+      it 'should return an array' do
+        expect(agents).to be_an_instance_of(Array)
+      end
+
       it 'should have ten agents' do
-        agents = client.vcc_agent_list
         expect(agents.count).to eq(10)
-        expect(agents.first[:crmname]).to eq(1005)
-        expect(agents.last[:crmname]).to eq(1001)
+      end
+
+      it 'should have first agent with crmname 1005' do
+        expect(agents.first["crmname"]).to eq("1005")
+      end
+
+      it 'should have last agent with crmname 1001' do
+        expect(agents.last["crmname"]).to eq("1001")
+      end
+
+      it 'should delete all agents' do
+        agents.each do |agent|
+          client.vcc_agent_del(agent["crm_id"])
+        end
       end
     end
   end
