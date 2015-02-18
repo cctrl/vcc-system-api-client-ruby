@@ -1,2 +1,1 @@
-# vcc-system-api-ruby-client
-VCC System API Client
+# VCC System API Client (Ruby)
