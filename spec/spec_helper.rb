@@ -16,6 +16,10 @@ def load_credentials_yaml
   YAML.load(File.read(File.expand_path('../credentials.yml', __FILE__)))
 end
 
+def remove_all_agents
+  # TODO
+end
+
 RSpec.configure do |config|
   config.fail_fast = true
 end

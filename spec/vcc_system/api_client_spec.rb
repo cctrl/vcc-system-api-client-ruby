@@ -12,9 +12,20 @@ RSpec.describe VCCSystem::APIClient do
     VCCSystem::APIClient.new(project_guid, debug: true)
   end
 
-  it 'should create an agent' do
-    vcc_id = client.vcc_agent_add(1001)
-    expect(vcc_id).to be > 0
+  context "all agents allocated" do
+    describe "#vcc_agent_list" do
+      it 'should have ten agents' do
+        agents = client.vcc_agent_list
+        expect(agents.count).to eq(10)
+        expect(agents.first[:crmname]).to eq(1005)
+        expect(agents.last[:crmname]).to eq(1001)
+      end
+    end
   end
+
+#  it 'should create an agent' do
+#    vcc_id = client.vcc_agent_add(1001)
+#    expect(vcc_id).to be > 0
+#  end
 
 end

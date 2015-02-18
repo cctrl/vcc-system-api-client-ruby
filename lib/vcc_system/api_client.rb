@@ -13,6 +13,12 @@ module VCCSystem
     attr_accessor :debug
     attr_accessor :project_guid
 
+    AGENT_ADD_STATUS = {
+      "1" => "Failed to add agent",
+      "2" => "Permission denied",
+      "4" => "Number of agents exceeded"
+    }
+
     def initialize(project_guid, *args)
       options = Hash[(args.first || {}).map { |k,v| [k.to_sym,v] }]
 
@@ -41,17 +47,10 @@ module VCCSystem
         raise "Invalid response for #{__method__} (#{e.message})"
       end
 
-      case parsed[:status]
-      when "0"
+      if parsed[:status] == "0"
         parsed[:items].first
-      when "1"
-        raise "Failed to add agent"
-      when "3"
-        raise "Permission denied"
-      when "4"
-        raise "Number of agents exceeded"
       else
-        raise "Invalid status (#{parsed[:status]})"
+        raise AGENT_ADD_STATUS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
       end
     end
 
