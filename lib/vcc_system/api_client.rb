@@ -19,10 +19,8 @@ module VCCSystem
       "4" => "Number of agents exceeded"
     }
 
-    AGENT_LIST_ERRORS = {
-    }
-
     AGENT_DEL_ERRORS = {
+      "1" => "Failed to delete agent"
     }
 
     def initialize(project_guid, *args)
@@ -73,12 +71,12 @@ module VCCSystem
       if parsed[:status] == "0"
         parsed[:items]
       else
-        raise AGENT_LIST_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
+        raise "Invalid status (#{parsed[:status]})"
       end
     end
 
-    def vcc_agent_del(vcc_id)
-      response = self.execute __method__, project_guid: self.project_guid, vcc_id: vcc_id
+    def vcc_agent_del(agent_exten)
+      response = self.execute __method__, project_guid: self.project_guid, agent_exten: agent_exten
 
       parsed = begin
         self.parse_response!(response, nil, :xml)

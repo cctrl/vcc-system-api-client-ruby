@@ -22,21 +22,21 @@ RSpec.describe VCCSystem::APIClient do
         expect(agents).to be_an_instance_of(Array)
       end
 
-      it 'should have ten agents' do
-        expect(agents.count).to eq(10)
-      end
+      #it 'should have ten agents' do
+      #  expect(agents.count).to eq(10)
+      #end
 
-      it 'should have first agent with crmname 1005' do
-        expect(agents.first["crmname"]).to eq("1005")
-      end
+      #it 'should have first agent with crmname 1005' do
+      #  expect(agents.first["crmname"]).to eq("1005")
+      #end
 
-      it 'should have last agent with crmname 1001' do
-        expect(agents.last["crmname"]).to eq("1001")
-      end
+      #it 'should have last agent with crmname 1001' do
+      #  expect(agents.last["crmname"]).to eq("1001")
+      #end
 
       it 'should delete all agents' do
         agents.each do |agent|
-          client.vcc_agent_del(agent["crm_id"])
+          client.vcc_agent_del(agent["exten"])
         end
       end
     end
