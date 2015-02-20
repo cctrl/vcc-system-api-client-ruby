@@ -16,7 +16,7 @@ module VCCSystem
         campaign_type: CAMPAIGN_TYPE_OUTBOUND
 
       parsed = begin
-        self.parse_response!(response, nil, :xml)
+        self.parse_response!(response, :xml)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
@@ -31,7 +31,7 @@ module VCCSystem
         guid: guid
 
       parsed = begin
-        self.parse_response!(response, nil, :xml)
+        self.parse_response!(response, :xml)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
@@ -49,7 +49,7 @@ module VCCSystem
       ) }
 
       parsed = begin
-        self.parse_response!(response, extract, :xml)
+        self.parse_response!(response, :xml, extract)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end

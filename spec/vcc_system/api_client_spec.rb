@@ -57,8 +57,8 @@ RSpec.describe VCCSystem::APIClient do
     count_before = campaigns.count
     skip "No campaigns found" unless count_before > 0
 
-    campaigns.each do |agent|
-      @client.vcc_campaign_del(agent["guid"])
+    campaigns.each do |campaign|
+      @client.vcc_campaign_del(campaign["guid"])
     end
 
     campaigns = @client.vcc_campaign_list()
@@ -87,6 +87,43 @@ RSpec.describe VCCSystem::APIClient do
       campaigns = @client.vcc_campaign_list()
       campaign_names = campaigns.map { |campaign| campaign["name"] }
       expect(campaign_names).not_to include(*@campaign_names)
+    end
+  end
+
+  context "within a campaign" do
+    before(:context) do
+      @campaign_guid = @client.vcc_campaign_add("Testing Campaign + Leads")
+    end
+
+    let(:leads) { @client.vcc_lead_list(@campaign_guid) }
+
+    context "added leads" do
+      before(:context) do
+        @lead_phones = %w(14162223333 14164321234 14169998765)
+        @lead_phones.each do |lead_phone|
+          @client.vcc_lead_add(@campaign_guid, lead_phone, lead_phone)
+        end
+      end
+
+      it "list added leads" do
+        leads
+        lead_phones = leads.map { |lead| lead["phone"] }
+        expect(lead_phones).to include(*@lead_phones)
+      end
+
+      it "do not list deleted leads" do
+        leads.each do |lead|
+          @client.vcc_lead_del(lead["guid"])
+        end
+
+        leads = @client.vcc_lead_list(@campaign_guid)
+        lead_phones = leads.map { |lead| lead["phone"] }
+        expect(lead_phones).not_to include(*@lead_phones)
+      end
+    end
+
+    after(:context) do
+      @client.vcc_campaign_del(@campaign_guid)
     end
   end
 

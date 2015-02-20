@@ -6,6 +6,7 @@ require 'colorize'
 
 require File.expand_path('agent', File.dirname(__FILE__))
 require File.expand_path('campaign', File.dirname(__FILE__))
+require File.expand_path('lead', File.dirname(__FILE__))
 
 module VCCSystem
   class APIClient
@@ -19,6 +20,7 @@ module VCCSystem
 
     include Agent
     include Campaign
+    include Lead
 
     def initialize(project_guid, *args)
       options = Hash[(args.first || {}).map { |k,v| [k.to_sym,v] }]
@@ -88,19 +90,19 @@ module VCCSystem
       parsed
     end
 
-    def parse_json_response(response, extract)
+    def parse_json_response(response)
       JSON.parse response
     end
 
-    def parse_response!(response, extract, format=:xml)
+    def parse_response!(response, format=:json, extract=nil)
       raise "Invalid response" unless response.instance_of? Faraday::Response
       raise "Invalid response status (#{response.status})" unless response.status == 200
 
       case format.to_sym
+      when :json
+        parse_json_response(response.body)
       when :xml
         parse_xml_response(response.body, extract)
-      when :json
-        parse_json_response(response.body, extract)
       else
         raise "Invalid format (#{format})"
       end
