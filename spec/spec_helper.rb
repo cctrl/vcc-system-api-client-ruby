@@ -12,14 +12,17 @@ end
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 $LOAD_PATH.uniq!
 
-def load_credentials_yaml
+def get_credentials
   YAML.load(File.read(File.expand_path('../credentials.yml', __FILE__)))
 end
 
-def remove_all_agents
-  # TODO
+def get_api_client
+  credentials = get_credentials()
+  project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+  VCCSystem::APIClient.new(project_guid, debug: true)
 end
 
 RSpec.configure do |config|
   config.fail_fast = true
+  config.filter_run_excluding :disabled => true
 end

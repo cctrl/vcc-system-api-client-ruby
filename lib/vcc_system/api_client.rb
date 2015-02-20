@@ -2,6 +2,10 @@ require 'addressable/uri'
 require 'faraday'
 require 'nokogiri'
 require 'json'
+require 'colorize'
+
+require File.expand_path('agent', File.dirname(__FILE__))
+require File.expand_path('campaign', File.dirname(__FILE__))
 
 module VCCSystem
   class APIClient
@@ -13,15 +17,8 @@ module VCCSystem
     attr_accessor :debug
     attr_accessor :project_guid
 
-    AGENT_ADD_ERRORS = {
-      "1" => "Failed to add agent",
-      "2" => "Permission denied",
-      "4" => "Number of agents exceeded"
-    }
-
-    AGENT_DEL_ERRORS = {
-      "1" => "Failed to delete agent"
-    }
+    include Agent
+    include Campaign
 
     def initialize(project_guid, *args)
       options = Hash[(args.first || {}).map { |k,v| [k.to_sym,v] }]
@@ -34,60 +31,11 @@ module VCCSystem
       self.project_guid = project_guid
 
       url = self.get_api_uri.normalize.to_s
-      puts "Connecting:\n\t#{url}" if self.debug
+      puts "Connecting:\n\t#{url}".magenta if self.debug
 
       self.connection = Faraday.new(url: url) do |faraday|
         faraday.ssl.verify = false
         faraday.adapter Faraday.default_adapter
-      end
-    end
-
-    def vcc_agent_add(crm_id)
-      response = self.execute __method__, project_guid: self.project_guid, crm_id: crm_id
-
-      parsed = begin
-        self.parse_response!(response, nil, :xml)
-      rescue RuntimeError => e
-        raise "Invalid response for #{__method__} (#{e.message})"
-      end
-
-      if parsed[:status] == "0"
-        parsed[:items].first
-      else
-        raise AGENT_ADD_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
-      end
-    end
-
-    def vcc_agent_list
-      response = self.execute __method__, project_guid: self.project_guid
-      extract = { item: %w(exten crmname agent_type project_guid crm_id project_name) }
-
-      parsed = begin
-        self.parse_response!(response, extract, :xml)
-      rescue RuntimeError => e
-        raise "Invalid response for #{__method__} (#{e.message})"
-      end
-
-      if parsed[:status] == "0"
-        parsed[:items]
-      else
-        raise "Invalid status (#{parsed[:status]})"
-      end
-    end
-
-    def vcc_agent_del(agent_exten)
-      response = self.execute __method__, project_guid: self.project_guid, agent_exten: agent_exten
-
-      parsed = begin
-        self.parse_response!(response, nil, :xml)
-      rescue RuntimeError => e
-        raise "Invalid response for #{__method__} (#{e.message})"
-      end
-
-      if parsed[:status] == "0"
-        true
-      else
-        raise AGENT_DEL_ERRORS[(parsed[:status])] || "Invalid status (#{parsed[:status]})"
       end
     end
 
@@ -102,21 +50,21 @@ module VCCSystem
     end
 
     def execute(method, *params)
-      puts "Executing:\n\t#{method}" if self.debug
+      puts "Executing:\n\t#{method}".blue if self.debug
       response = self.connection.get do |req|
         req.url "#{self.path}/#{method}.php"
         (params.first || {}).each { |k,v| req.params[k] = v }
       end
-      puts "Request:\n\t#{response.env.url.to_s}" if self.debug
-      puts "Response:\n\t#{response.body}\n" if self.debug
+      puts "Request:\n\t#{response.env.url.to_s}".yellow if self.debug
+      puts "Response:\n\t#{response.body}\n".cyan if self.debug
       response
     end
 
     def extract_xml_element_content(element)
-      element = element.first if element.instance_of? Array
-      element = element.first if element.instance_of? Nokogiri::XML::NodeSet
-      return unless element.instance_of? Nokogiri::XML::Element
-      element.content
+      element = element.first   if element.instance_of? Array
+      element = element.first   if element.instance_of? Nokogiri::XML::NodeSet
+      element = element.content if element.instance_of? Nokogiri::XML::Element
+      element
     end
 
     def extract_xml_item(item, extract)
@@ -132,14 +80,10 @@ module VCCSystem
       parsed = {}
 
       status = xml.xpath("//root/status")
-      if status.count == 1
-        parsed[:status] = status.first.content
-      end
+      parsed[:status] = status.first.content if status.count == 1
 
       items = xml.xpath("//root/response/item")
-      extract_item = extract.instance_of?(Hash) ? extract[:item] : nil
-
-      parsed[:items] = items.map { |item| self.extract_xml_item(item, extract_item) }
+      parsed[:items] = items.map { |item| self.extract_xml_item(item, (extract || {})[:item]) }
 
       parsed
     end
