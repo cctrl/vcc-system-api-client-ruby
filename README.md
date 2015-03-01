@@ -6,30 +6,93 @@ gem install vcc-system-api-client
 
 ```
 require 'vcc_system/api_client'
+```
 
+New client:
+
+```
 project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
 @client = VCCSystem::APIClient.new project_guid
+```
 
-# add agent
+## Workflow A: Storing VCC ids
+
+Add agent:
+
+```
 crm_id = 'Agent_1001'
-agent_guid = @client.vcc_agent_add crm_id
+agent_id = @client.vcc_agent_add crm_id
+```
 
-# add campaign
+Add campaign:
+
+```
 campaign_name = "My New Campaign"
 campaign_guid = @client.vcc_campaign_add campaign_name
+```
 
-# add lead
+Add lead:
+
+```
 phone = "14160000000"
 reference_id = "Lead_2001"
 lead_guid = @client.vcc_lead_add(campaign_guid, phone, reference_id)
+```
 
-# start agent
+Start agent:
+
+```
 proxy_url = "http://myhost.com/path/to/proxy.html"
 proxy_path = proxy_url.sub(/^.*:\/\//, '').sub(/\/proxy.html$/, '') # myhost.com/path/to
-agent_url = @client.vcc_agent_start(agent_guid, campaign_guid, proxy_path)
+agent_url = @client.vcc_agent_start(agent_id, campaign_guid, proxy_path)
+```
 
-# delete
+Delete:
+
+```
 @client.vcc_lead_del(lead_guid)
 @client.vcc_campaign_del(campaign_guid)
-@client.vcc_agent_del(agent_guid)
+@client.vcc_agent_del(agent_id)
+```
+
+### Workflow B: Without storing VCC ids
+
+Add agent:
+
+```
+crm_id = 'Agent_1001'
+@client.vcc_agent_add crm_id
+```
+
+Retrieve agent:
+
+```
+agent_id = @client.vcc_agent_list.select { |a| a["crmname"] = crm_id }.first["exten"]
+```
+
+Add campaign:
+
+```
+campaign_name = "My New Campaign"
+@client.vcc_campaign_add campaign_name
+```
+
+Retrieve campaign:
+
+```
+campaign_guid = @client.vcc_campaign_list.select { |c| c["name"] = campaign_name }.first["guid"]
+```
+
+Add lead:
+
+```
+phone = "14160000000"
+reference_id = "Lead_2001"
+@client.vcc_lead_add(campaign_guid, phone, reference_id)
+```
+
+Retrieve lead:
+
+```
+lead_guid = @client.vcc_lead_list(campaign_guid).select { |l| l["reference"] = reference_id }.first["guid"]
 ```
