@@ -1,7 +1,7 @@
 # VCC System API Client (Ruby)
 
 ```
-gem install vcc-system-api-client
+gem 'vcc-system-api-client', :git => 'git://github.com/lememora/vcc-system-api-client-ruby.git'
 ```
 
 ```
