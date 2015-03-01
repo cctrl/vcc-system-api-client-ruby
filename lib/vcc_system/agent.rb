@@ -55,7 +55,7 @@ module VCCSystem
       uri = self.get_api_uri
       uri.path = self.path
       uri.query_values = {
-        agent: agent, campaign: campaign, project: project,
+        agent: agent, campaign: campaign, project: self.project_guid,
         vcc: self.host, crm: crm
       }
       uri.normalize.to_s
