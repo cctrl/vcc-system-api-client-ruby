@@ -51,13 +51,24 @@ module VCCSystem
       )
     end
 
+    def execute_post(method, *params)
+      puts "Executing:\n\t#{method}".blue if self.debug
+      response = self.connection.post do |req|
+        req.url "#{self.path}/#{method}.php"
+        (params.first || {}).each { |k,v| req.params[k] = v }
+      end
+      puts "Request(POST):\n\t#{response.env.url.to_s}".yellow if self.debug
+      puts "Response:\n\t#{response.body}\n".cyan if self.debug
+      response
+    end
+
     def execute(method, *params)
       puts "Executing:\n\t#{method}".blue if self.debug
       response = self.connection.get do |req|
         req.url "#{self.path}/#{method}.php"
         (params.first || {}).each { |k,v| req.params[k] = v }
       end
-      puts "Request:\n\t#{response.env.url.to_s}".yellow if self.debug
+      puts "Request(GET):\n\t#{response.env.url.to_s}".yellow if self.debug
       puts "Response:\n\t#{response.body}\n".cyan if self.debug
       response
     end
@@ -69,7 +80,7 @@ module VCCSystem
       element
     end
 
-    def extract_xml_item(item, extract)
+    def extract_xml_item(item, extract=nil)
       if extract.instance_of? Array
         Hash[extract.map { |k| [ k, self.extract_xml_element_content(item.xpath(k)) ] }]
       else
@@ -80,12 +91,18 @@ module VCCSystem
     def parse_xml_response(response, extract)
       xml = Nokogiri::XML(response)
       parsed = {}
+      extract ||= {}
 
       status = xml.xpath("//root/status")
       parsed[:status] = status.first.content if status.count == 1
 
       items = xml.xpath("//root/response/item")
-      parsed[:items] = items.map { |item| self.extract_xml_item(item, (extract || {})[:item]) }
+      parsed[:items] = items.map { |item| self.extract_xml_item(item, extract[:item]) }
+
+      # optional result parsing
+      leads = xml.xpath("//root/lead")
+      extracted_leads = leads.map { |lead| self.extract_xml_item(lead) } || []
+      parsed[:leads] = extracted_leads.map { |lead| Hash[(extract[:lead] || []).zip lead.to_s.split(',')] } if extracted_leads.length > 0
 
       parsed
     end

@@ -97,12 +97,35 @@ RSpec.describe VCCSystem::APIClient do
 
     let(:leads) { @client.vcc_lead_list(@campaign_guid) }
 
-    context "added leads" do
+    context "individual added leads" do
       before(:context) do
         @lead_phones = %w(14162223333 14164321234 14169998765)
         @lead_phones.each do |lead_phone|
           @client.vcc_lead_add(@campaign_guid, lead_phone, lead_phone)
         end
+      end
+
+      it "list added leads" do
+        leads
+        lead_phones = leads.map { |lead| lead["phone"] }
+        expect(lead_phones).to include(*@lead_phones)
+      end
+
+      it "do not list deleted leads" do
+        leads.each do |lead|
+          @client.vcc_lead_del(lead["guid"])
+        end
+
+        leads = @client.vcc_lead_list(@campaign_guid)
+        lead_phones = leads.map { |lead| lead["phone"] }
+        expect(lead_phones).not_to include(*@lead_phones)
+      end
+    end
+
+    context "bulk added leads" do
+      before(:context) do
+        @lead_phones = %w(14162332233 14163432124 16479769985)
+        @client.vcc_leads_add(@campaign_guid, @lead_phones, @lead_phones)
       end
 
       it "list added leads" do
