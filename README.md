@@ -67,7 +67,7 @@ crm_id = 'Agent_1001'
 Retrieve agent:
 
 ```
-agent_id = @client.vcc_agent_list.select { |a| a["crmname"] = crm_id }.first["exten"]
+agent_id = @client.vcc_agent_list.select { |a| a["crmname"] == crm_id }.first["exten"]
 ```
 
 Add campaign:
@@ -80,7 +80,7 @@ campaign_name = "My New Campaign"
 Retrieve campaign:
 
 ```
-campaign_guid = @client.vcc_campaign_list.select { |c| c["name"] = campaign_name }.first["guid"]
+campaign_guid = @client.vcc_campaign_list.select { |c| c["name"] == campaign_name }.first["guid"]
 ```
 
 Add lead:
@@ -94,5 +94,5 @@ reference_id = "Lead_2001"
 Retrieve lead:
 
 ```
-lead_guid = @client.vcc_lead_list(campaign_guid).select { |l| l["reference"] = reference_id }.first["guid"]
+lead_guid = @client.vcc_lead_list(campaign_guid).select { |l| l["reference"] == reference_id }.first["guid"]
 ```
