@@ -18,8 +18,8 @@ end
 
 def get_api_client
   credentials = get_credentials()
-  project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
-  VCCSystem::APIClient.new(project_guid, debug: true)
+  VCCSystem.config.project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+  VCCSystem::APIClient.new(debug: true)
 end
 
 RSpec.configure do |config|

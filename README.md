@@ -11,8 +11,8 @@ require 'vcc_system/api_client'
 New client:
 
 ```
-project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
-@client = VCCSystem::APIClient.new project_guid
+VCCSystem.config.project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+@client = VCCSystem::APIClient.new
 ```
 
 ## Workflow A: Storing VCC ids

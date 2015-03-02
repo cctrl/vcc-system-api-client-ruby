@@ -4,6 +4,7 @@ require 'nokogiri'
 require 'json'
 require 'colorize'
 
+require File.expand_path('config', File.dirname(__FILE__))
 require File.expand_path('agent', File.dirname(__FILE__))
 require File.expand_path('campaign', File.dirname(__FILE__))
 require File.expand_path('lead', File.dirname(__FILE__))
@@ -22,15 +23,16 @@ module VCCSystem
     include Campaign
     include Lead
 
-    def initialize(project_guid, *args)
+    def initialize(*args)
       options = Hash[(args.first || {}).map { |k,v| [k.to_sym,v] }]
+      config = VCCSystem.config
 
-      self.scheme = options[:scheme] || 'https'
-      self.host = options[:host] || 'nbvcc.giisystems.com'
-      self.port = options[:port] || 443
-      self.path = options[:path] || '/vcc'
-      self.debug = options[:debug] || false
-      self.project_guid = project_guid
+      self.scheme = options[:scheme] || config.scheme
+      self.host = options[:host] || config.host
+      self.port = options[:port] || config.port
+      self.path = options[:path] || config.path
+      self.debug = options[:debug] || config.debug
+      self.project_guid = options[:project_guid] || config.project_guid
 
       url = self.get_api_uri.normalize.to_s
       puts "Connecting:\n\t#{url}".magenta if self.debug
