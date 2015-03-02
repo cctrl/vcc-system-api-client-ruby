@@ -124,7 +124,7 @@ RSpec.describe VCCSystem::APIClient do
 
     context "bulk added leads" do
       before(:context) do
-        @lead_phones = %w(14162332233 14163432124 16479769985)
+        @lead_phones = %w(14162332233 14163432124 16479769985 16479760000)
         @client.vcc_leads_add(@campaign_guid, @lead_phones, @lead_phones)
       end
 

@@ -32,24 +32,20 @@ module VCCSystem
       phones ||= []
       reference_ids ||= []
       raise "phones and reference_ids should have same size" unless phones.length == reference_ids.length
+      count = phones.length
 
       response = self.execute_post __method__, project_guid: self.project_guid,
         campaign_guid: campaign_guid,
         phone: phones,
         reference_id: reference_ids
 
-      extract = { lead: %w(guid phone reference_id) }
-
-      # <root><lead>c1dc9360-beab-46fe-bcda-561ae629a46f,14162332233,14162332233</lead><lead>c1dc9360-beab-46fe-bcda-561ae629a46f,14163432124,14163432124</lead><lead>c1dc9360-beab-46fe-bcda-561ae629a46f,16479769985,16479769985</lead><status>0</status><response><count>3</count></response></root>
       parsed = begin
-        self.parse_response!(response, :xml, extract)
+        self.parse_response!(response, :xml)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
 
-      return parsed[:items].first if parsed[:status] == "0"
-
-      raise(LEAD_ADD_ERRORS[(parsed[:status])] || "Failed (status: #{parsed[:status]})")
+      return parsed[:status]
     end
 
     def vcc_lead_del(lead_guid)

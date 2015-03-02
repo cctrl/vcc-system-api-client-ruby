@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = "vcc-system-api-client"
-  s.version = '0.2.0'
-  s.date = '2015-03-01'
+  s.version = '0.2.1'
+  s.date = '2015-03-02'
   s.summary = "VCC System API Client"
   s.description = "VCC System API Ruby Client gem"
   s.authors = ["Rafael Moraes"]
@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'addressable', '~> 2.3'
   s.add_runtime_dependency 'faraday', '~> 0.9'
   s.add_runtime_dependency 'json', '~> 1.8'
+  s.add_runtime_dependency 'nokogiri', '~> 1.6'
   s.add_runtime_dependency 'colorize', '~> 0.7'
   s.add_runtime_dependency 'activesupport', '>= 3.0.0'
 
