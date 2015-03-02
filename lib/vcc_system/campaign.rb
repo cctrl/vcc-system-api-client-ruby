@@ -13,7 +13,8 @@ module VCCSystem
     def vcc_campaign_add(name)
       response = self.execute __method__, project_guid: self.project_guid,
         name: name,
-        campaign_type: CAMPAIGN_TYPE_OUTBOUND
+        campaign_type: CAMPAIGN_TYPE_OUTBOUND,
+        dial_ratio: 1
 
       parsed = begin
         self.parse_response!(response, :xml)

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "vcc-system-api-client"
-  s.version = '0.2.1'
+  s.version = '0.2.2'
   s.date = '2015-03-02'
   s.summary = "VCC System API Client"
   s.description = "VCC System API Ruby Client gem"
