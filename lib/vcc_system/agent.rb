@@ -53,7 +53,7 @@ module VCCSystem
 
     def vcc_agent_start(agent, campaign, crm)
       uri = self.get_api_uri
-      uri.path = self.path
+      uri.path = "#{self.path}/#{__method__}.php"
       uri.query_values = {
         agent: agent, campaign: campaign, project: self.project_guid,
         vcc: self.host, crm: crm
