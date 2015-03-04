@@ -17,6 +17,7 @@ module VCCSystem
     config_accessor :path
     config_accessor :debug
     config_accessor :project_guid
+    config_accessor :api_token
 
     def param_name
       config.param_name.respond_to?(:call) ? config.param_name.call : config.param_name

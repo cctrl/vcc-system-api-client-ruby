@@ -10,6 +10,7 @@ require File.expand_path('campaign', File.dirname(__FILE__))
 require File.expand_path('lead', File.dirname(__FILE__))
 
 module VCCSystem
+  # TODO refactory execute/execute_post
   class APIClient
     attr_accessor :connection
     attr_accessor :scheme
@@ -18,6 +19,7 @@ module VCCSystem
     attr_accessor :path
     attr_accessor :debug
     attr_accessor :project_guid
+    attr_accessor :api_token
 
     include Agent
     include Campaign
@@ -33,6 +35,7 @@ module VCCSystem
       self.path = options[:path] || config.path
       self.debug = options[:debug] || config.debug
       self.project_guid = options[:project_guid] || config.project_guid
+      self.api_token = options[:api_token] || config.api_token
 
       url = self.get_api_uri.normalize.to_s
       puts "Connecting:\n\t#{url}".magenta if self.debug
@@ -55,9 +58,11 @@ module VCCSystem
 
     def execute_post(method, *params)
       puts "Executing:\n\t#{method}".blue if self.debug
+      request_params = (params.first || {})
+      request_params[:api_token] = self.api_token if self.api_token
       response = self.connection.post do |req|
         req.url "#{self.path}/#{method}.php"
-        (params.first || {}).each { |k,v| req.params[k] = v }
+        request_params.each { |k,v| req.params[k] = v }
       end
       puts "Request(POST):\n\t#{response.env.url.to_s}".yellow if self.debug
       puts "Response:\n\t#{response.body}\n".cyan if self.debug
@@ -66,9 +71,11 @@ module VCCSystem
 
     def execute(method, *params)
       puts "Executing:\n\t#{method}".blue if self.debug
+      request_params = (params.first || {})
+      request_params[:api_token] = self.api_token if self.api_token
       response = self.connection.get do |req|
         req.url "#{self.path}/#{method}.php"
-        (params.first || {}).each { |k,v| req.params[k] = v }
+        request_params.each { |k,v| req.params[k] = v }
       end
       puts "Request(GET):\n\t#{response.env.url.to_s}".yellow if self.debug
       puts "Response:\n\t#{response.body}\n".cyan if self.debug

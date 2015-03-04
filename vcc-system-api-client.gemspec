@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = "vcc-system-api-client"
-  s.version = '0.2.3'
-  s.date = '2015-03-02'
+  s.version = '0.2.4'
+  s.date = '2015-03-04'
   s.summary = "VCC System API Client"
   s.description = "VCC System API Ruby Client gem"
   s.authors = ["Rafael Moraes"]
-  s.email = "none@none.com"
+  s.email = "contact@moraesrafael.com"
   s.files = %w(vcc-system-api-client.gemspec README.md Gemfile)
   s.files += Dir.glob("lib/**/*.rb")
   s.files += Dir.glob("spec/**/*.{rb,opts}")

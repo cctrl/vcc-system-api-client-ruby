@@ -18,7 +18,10 @@ end
 
 def get_api_client
   credentials = get_credentials()
-  VCCSystem.config.project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+  VCCSystem.configure do |config|
+    config.project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+    config.api_token = credentials['api_token'] if credentials['api_token']
+  end
   VCCSystem::APIClient.new(debug: true)
 end
 

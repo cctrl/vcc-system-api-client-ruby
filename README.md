@@ -11,7 +11,10 @@ require 'vcc_system/api_client'
 New client:
 
 ```
-VCCSystem.config.project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+VCCSystem.configure do |config|
+  config.project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+  config.api_token = a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3e4f5a0b1
+end
 @client = VCCSystem::APIClient.new
 ```
 
