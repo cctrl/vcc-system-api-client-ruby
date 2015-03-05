@@ -46,9 +46,11 @@ Start agent:
 
 ```
 proxy_url = "http://myhost.com/path/to/proxy.html"
-proxy_path = proxy_url.sub(/^.*:\/\//, '').sub(/\/proxy.html$/, '') # myhost.com/path/to
+proxy_path = proxy_url.sub(/^.*:\/\//, '') # myhost.com/path/to/proxy.html
 agent_url = @client.vcc_agent_start(agent_id, campaign_guid, proxy_path)
 ```
+
+Note: VCC System uses [Porthole](https://github.com/ternarylabs/porthole) to allow cross domain iframe communication.
 
 Delete:
 
@@ -98,4 +100,12 @@ Retrieve lead:
 
 ```
 lead_guid = @client.vcc_lead_list(campaign_guid).select { |l| l["reference"] == reference_id }.first["guid"]
+```
+
+Add multiple leads at once:
+
+```
+phones = ["14160000001", "14162000003", "14164000005" ]
+reference_ids = ["Lead_3001", "Lead_3002", "Lead_3003"]
+@client.vcc_leads_add(campaign_guid, phones, reference_ids)
 ```
