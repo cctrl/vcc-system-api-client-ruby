@@ -17,12 +17,12 @@ module VCCSystem
         dial_ratio: 1
 
       parsed = begin
-        self.parse_response!(response, :xml)
+        self.parse_response!(response)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
 
-      return parsed[:items].first if parsed[:status] == "0"
+      return parsed[:campaign_guid] if parsed[:status] == "0"
 
       raise(CAMPAIGN_ADD_ERRORS[(parsed[:status])] || "Failed (status: #{parsed[:status]})")
     end
@@ -32,7 +32,7 @@ module VCCSystem
         guid: guid
 
       parsed = begin
-        self.parse_response!(response, :xml)
+        self.parse_response!(response)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end

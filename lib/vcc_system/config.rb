@@ -30,7 +30,7 @@ module VCCSystem
 
   configure do |config|
     config.scheme = 'https'
-    config.host = 'nbvcc.giisystems.com'
+    config.host = 'vcc.giisystems.com'
     config.port = 443
     config.path = '/vcc'
     config.debug = false

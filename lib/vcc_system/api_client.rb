@@ -117,7 +117,11 @@ module VCCSystem
     end
 
     def parse_json_response(response)
-      JSON.parse response
+      parsed = JSON.parse(response)
+      if parsed.instance_of? Hash
+        parsed = parsed.inject({}){ |memo,(k,v)| memo[k.to_sym] = v; memo }
+      end
+      parsed
     end
 
     def parse_response!(response, format=:json, extract=nil)
