@@ -61,5 +61,11 @@ module VCCSystem
       uri.normalize.to_s
     end
 
+    def vcc_agent_proxy
+      uri = self.get_api_uri
+      uri.path = "#{self.path}/proxy.html"
+      uri.normalize.to_s
+    end
+
   end
 end
