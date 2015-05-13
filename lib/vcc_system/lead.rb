@@ -65,7 +65,17 @@ module VCCSystem
       response = self.execute __method__, project_guid: self.project_guid,
         guid: campaign_guid
 
-      parsed = begin
+      begin
+        self.parse_response!(response)
+      rescue RuntimeError => e
+        raise "Invalid response for #{__method__} (#{e.message})"
+      end
+    end
+
+    def vcc_lead_status(campaign_guid)
+      response = self.execute __method__, campaign_guid: campaign_guid
+
+      begin
         self.parse_response!(response)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
