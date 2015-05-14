@@ -95,8 +95,7 @@ RSpec.describe VCCSystem::APIClient do
       @campaign_guid = @client.vcc_campaign_add("Testing Campaign + Leads")
     end
 
-    let(:leads) { @client.vcc_lead_list(@campaign_guid) }
-    let(:leads_status) { @client.vcc_lead_status(@campaign_guid) }
+    let(:leads) { @client.vcc_lead_status(@campaign_guid) }
 
     context "individual added leads" do
       before(:context) do
@@ -112,18 +111,12 @@ RSpec.describe VCCSystem::APIClient do
         expect(lead_phones).to include(*@lead_phones)
       end
 
-      it "check the leads status" do
-        leads_status
-        lead_statuses = leads_status.map { |lead| lead["status"] }
-        expect(lead_statuses.uniq).to eq(["NEW"])
-      end
-
       it "do not list deleted leads" do
         leads.each do |lead|
-          @client.vcc_lead_del(lead["guid"])
+          @client.vcc_lead_del(lead["guid"], @campaign_guid)
         end
 
-        leads = @client.vcc_lead_list(@campaign_guid)
+        leads = @client.vcc_lead_status(@campaign_guid)
         lead_phones = leads.map { |lead| lead["phone"] }
         expect(lead_phones).not_to include(*@lead_phones)
       end
@@ -143,10 +136,10 @@ RSpec.describe VCCSystem::APIClient do
 
       it "do not list deleted leads" do
         leads.each do |lead|
-          @client.vcc_lead_del(lead["guid"])
+          @client.vcc_lead_del(lead["guid"], @campaign_guid)
         end
 
-        leads = @client.vcc_lead_list(@campaign_guid)
+        leads = @client.vcc_lead_status(@campaign_guid)
         lead_phones = leads.map { |lead| lead["phone"] }
         expect(lead_phones).not_to include(*@lead_phones)
       end

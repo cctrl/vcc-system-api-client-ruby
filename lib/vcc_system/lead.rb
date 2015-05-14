@@ -48,28 +48,17 @@ module VCCSystem
       return parsed[:status]
     end
 
-    def vcc_lead_del(lead_guid)
+    def vcc_lead_del(lead_guid, campaign_guid)
       response = self.execute __method__, project_guid: self.project_guid,
-        guid: lead_guid
+        guid: lead_guid, campaign_guid: campaign_guid
 
       parsed = begin
-        self.parse_response!(response, :xml)
+        self.parse_response!(response)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
 
       parsed[:status] == "0" || raise("Failed (status: #{parsed[:status]})")
-    end
-
-    def vcc_lead_list(campaign_guid)
-      response = self.execute __method__, project_guid: self.project_guid,
-        guid: campaign_guid
-
-      begin
-        self.parse_response!(response)
-      rescue RuntimeError => e
-        raise "Invalid response for #{__method__} (#{e.message})"
-      end
     end
 
     def vcc_lead_status(campaign_guid)
