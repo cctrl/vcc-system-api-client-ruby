@@ -14,7 +14,8 @@ module VCCSystem
       response = self.execute __method__, project_guid: self.project_guid,
         name: name,
         campaign_type: CAMPAIGN_TYPE_OUTBOUND,
-        dial_ratio: 1
+        dial_ratio: 1,
+        callerid_number: (self.caller_id || 14160000000)
 
       parsed = begin
         self.parse_response!(response)

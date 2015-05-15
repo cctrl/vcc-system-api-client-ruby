@@ -21,6 +21,7 @@ def get_api_client
   VCCSystem.configure do |config|
     config.project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
     config.api_token = credentials['api_token'] if credentials['api_token']
+    config.caller_id = credentials['caller_id'] if credentials['caller_id']
   end
   VCCSystem::APIClient.new(debug: true)
 end

@@ -19,6 +19,7 @@ module VCCSystem
     attr_accessor :path
     attr_accessor :debug
     attr_accessor :project_guid
+    attr_accessor :caller_id
     attr_accessor :api_token
 
     include Agent
@@ -35,6 +36,7 @@ module VCCSystem
       self.path = options[:path] || config.path
       self.debug = options[:debug] || config.debug
       self.project_guid = options[:project_guid] || config.project_guid
+      self.caller_id = options[:caller_id] || config.caller_id
       self.api_token = options[:api_token] || config.api_token
 
       url = self.get_api_uri.normalize.to_s
