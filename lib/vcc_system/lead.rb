@@ -62,7 +62,8 @@ module VCCSystem
     end
 
     def vcc_lead_status(campaign_guid)
-      response = self.execute __method__, campaign_guid: campaign_guid
+      response = self.execute __method__, project_guid: self.project_guid,
+        campaign_guid: campaign_guid
 
       begin
         self.parse_response!(response)

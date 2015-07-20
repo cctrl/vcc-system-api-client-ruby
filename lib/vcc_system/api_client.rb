@@ -3,6 +3,7 @@ require 'faraday'
 require 'nokogiri'
 require 'json'
 require 'colorize'
+require 'logger'
 
 require File.expand_path('config', File.dirname(__FILE__))
 require File.expand_path('agent', File.dirname(__FILE__))
@@ -21,6 +22,7 @@ module VCCSystem
     attr_accessor :project_guid
     attr_accessor :caller_id
     attr_accessor :api_token
+    attr_accessor :logger
 
     include Agent
     include Campaign
@@ -38,9 +40,11 @@ module VCCSystem
       self.project_guid = options[:project_guid] || config.project_guid
       self.caller_id = options[:caller_id] || config.caller_id
       self.api_token = options[:api_token] || config.api_token
+      self.logger = options[:logger] || Logger.new(STDOUT)
+      self.logger.level = Logger::DEBUG if self.debug
 
       url = self.get_api_uri.normalize.to_s
-      puts "Connecting:\n\t#{url}".magenta if self.debug
+      self.logger.debug "Connecting: #{url}".magenta
 
       self.connection = Faraday.new(url: url) do |faraday|
         faraday.ssl.verify = false
@@ -59,28 +63,28 @@ module VCCSystem
     end
 
     def execute_post(method, *params)
-      puts "Executing:\n\t#{method}".blue if self.debug
+      self.logger.debug "Executing: #{method}".blue
       request_params = (params.first || {})
       request_params[:api_token] = self.api_token if self.api_token
       response = self.connection.post do |req|
         req.url "#{self.path}/#{method}.php"
         request_params.each { |k,v| req.params[k] = v }
       end
-      puts "Request(POST):\n\t#{response.env.url.to_s}".yellow if self.debug
-      puts "Response:\n\t#{response.body}\n".cyan if self.debug
+      self.logger.debug "Request(POST): #{response.env.url.to_s}".yellow
+      self.logger.debug "Response: #{response.body}".cyan
       response
     end
 
     def execute(method, *params)
-      puts "Executing:\n\t#{method}".blue if self.debug
+      self.logger.debug "Executing: #{method}".blue
       request_params = (params.first || {})
       request_params[:api_token] = self.api_token if self.api_token
       response = self.connection.get do |req|
         req.url "#{self.path}/#{method}.php"
         request_params.each { |k,v| req.params[k] = v }
       end
-      puts "Request(GET):\n\t#{response.env.url.to_s}".yellow if self.debug
-      puts "Response:\n\t#{response.body}\n".cyan if self.debug
+      self.logger.debug "Request(GET): #{response.env.url.to_s}".yellow
+      self.logger.debug "Response: #{response.body}".cyan
       response
     end
 

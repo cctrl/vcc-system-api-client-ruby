@@ -3,7 +3,6 @@ require 'spec_helper'
 require 'yaml'
 require 'vcc_system/api_client'
 
-
 RSpec.describe VCCSystem::APIClient do
 
   before(:context) do
@@ -28,7 +27,9 @@ RSpec.describe VCCSystem::APIClient do
 
   context "added agents" do
     before(:context) do
-      @crm_ids = [ "1001", "crm_id_2345", "ABCDEF" ]
+      @crm_ids = Array.new(3).map do
+        'A' + Digest::SHA2.new(512).hexdigest(rand.to_s).hex.to_s(36).slice(0, 31).upcase
+      end
       @crm_ids.each do |crm_id|
         @client.vcc_agent_add(crm_id)
       end
@@ -68,7 +69,9 @@ RSpec.describe VCCSystem::APIClient do
 
   context "added campaigns" do
     before(:context) do
-      @campaign_names = %w(campaign01 CampaignX CAMPAIGN_N)
+      @campaign_names = Array.new(3).map do
+        'C' + Digest::SHA2.new(512).hexdigest(rand.to_s).hex.to_s(36).slice(0, 31).upcase
+      end
       @campaign_names.each do |name|
         @client.vcc_campaign_add(name)
       end
@@ -99,16 +102,21 @@ RSpec.describe VCCSystem::APIClient do
 
     context "individual added leads" do
       before(:context) do
-        @lead_phones = %w(14162223333 14164321234 14169998765)
-        @lead_phones.each do |lead_phone|
-          @client.vcc_lead_add(@campaign_guid, lead_phone, lead_phone)
+        @phonebook = Hash[Array.new(3).map do
+          [
+            'L' + Digest::SHA2.new(512).hexdigest(rand.to_s).hex.to_s(36).slice(0, 31).upcase,
+            (rand * 10e9).floor.to_s.rjust(11, "2")
+          ]
+        end]
+        @phonebook.each do |reference_id,phone|
+          @client.vcc_lead_add(@campaign_guid, phone, reference_id)
         end
       end
 
       it "list added leads" do
         leads
         lead_phones = leads.map { |lead| lead["phone"] }
-        expect(lead_phones).to include(*@lead_phones)
+        expect(lead_phones).to include(*@phonebook.values)
       end
 
       it "do not list deleted leads" do
@@ -118,20 +126,25 @@ RSpec.describe VCCSystem::APIClient do
 
         leads = @client.vcc_lead_status(@campaign_guid)
         lead_phones = leads.map { |lead| lead["phone"] }
-        expect(lead_phones).not_to include(*@lead_phones)
+        expect(lead_phones).not_to include(*@phonebook.values)
       end
     end
 
     context "bulk added leads" do
       before(:context) do
-        @lead_phones = %w(14162332233 14163432124 16479769985 16479760000)
-        @client.vcc_leads_add(@campaign_guid, @lead_phones, @lead_phones)
+        @phonebook = Hash[Array.new(4).map do
+          [
+            'L' + Digest::SHA2.new(512).hexdigest(rand.to_s).hex.to_s(36).slice(0, 31).upcase,
+            (rand * 10e9).floor.to_s.rjust(11, "2")
+          ]
+        end]
+        @client.vcc_leads_add(@campaign_guid, @phonebook.values, @phonebook.keys)
       end
 
       it "list added leads" do
         leads
         lead_phones = leads.map { |lead| lead["phone"] }
-        expect(lead_phones).to include(*@lead_phones)
+        expect(lead_phones).to include(*@phonebook.values)
       end
 
       it "do not list deleted leads" do
@@ -141,7 +154,7 @@ RSpec.describe VCCSystem::APIClient do
 
         leads = @client.vcc_lead_status(@campaign_guid)
         lead_phones = leads.map { |lead| lead["phone"] }
-        expect(lead_phones).not_to include(*@lead_phones)
+        expect(lead_phones).not_to include(*@phonebook.values)
       end
     end
 
