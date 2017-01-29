@@ -3,7 +3,7 @@ unless File.exists? File.expand_path('../credentials.yml', __FILE__)
 --------------------------------------------------------------------------------
 ! Failed to load spec/credentials.yml. Please copy
 ! spec/credentials.yml.dist to spec/credentials.yml and define a valid
-! project_guid to run the tests.
+! account_id to run the tests.
 --------------------------------------------------------------------------------
   EOS
   exit
@@ -19,7 +19,7 @@ end
 def get_api_client
   credentials = get_credentials()
   VCCSystem.configure do |config|
-    config.project_guid = credentials['project_guid'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+    config.account_id = credentials['account_id'] || 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
     config.api_token = credentials['api_token'] if credentials['api_token']
     config.caller_id = credentials['caller_id'] if credentials['caller_id']
   end

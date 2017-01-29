@@ -16,7 +16,7 @@ module VCCSystem
     config_accessor :port
     config_accessor :path
     config_accessor :debug
-    config_accessor :project_guid
+    config_accessor :account_id
     config_accessor :caller_id
     config_accessor :api_token
 

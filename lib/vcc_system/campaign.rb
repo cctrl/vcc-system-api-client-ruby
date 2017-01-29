@@ -11,7 +11,8 @@ module VCCSystem
     }
 
     def vcc_campaign_add(name)
-      response = self.execute __method__, project_guid: self.project_guid,
+      byebug
+      response = self.execute __method__, account_id: self.account_id,
         name: name,
         campaign_type: CAMPAIGN_TYPE_OUTBOUND,
         dial_ratio: 1,
@@ -29,7 +30,7 @@ module VCCSystem
     end
 
     def vcc_campaign_del(guid)
-      response = self.execute __method__, project_guid: self.project_guid,
+      response = self.execute __method__, account_id: self.account_id,
         guid: guid
 
       parsed = begin
@@ -41,24 +42,20 @@ module VCCSystem
       parsed[:status] == "0" || raise("Failed (status: #{parsed[:status]})")
     end
 
-    def vcc_campaign_list
-      response = self.execute __method__, project_guid: self.project_guid
+    def vcc_campaign_outbound_list
+      response = self.execute __method__, account_id: self.account_id
       extract = { item: %w(
-        guid dt name lt_bucket order project_guid campaign_type incoming_number
+        guid dt name lt_bucket order account_id campaign_type incoming_number
         redial_id daytime_id trg_id expire_leads callerid_number dial_ratio
         billing script ext_group_type amd_on project_name dial_ratio_max
         dial_mode ext_group_id ext_group_name
       ) }
 
-      parsed = begin
-        self.parse_response!(response, :xml, extract)
+      begin
+        self.parse_response!(response, :json, extract) # Something about this line is failing, and returning {"items" => []} instead of a parsed version of the response-body.
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
-
-      return parsed[:items] if parsed[:status] == "0"
-
-      raise "Failed (status: #{parsed[:status]})"
     end
 
   end

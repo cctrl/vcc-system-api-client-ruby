@@ -11,7 +11,7 @@ module VCCSystem
       phone = phone.to_s.gsub(/[^\d]/, '')
       raise "Phone number format required: 1XXXXXXXXXX" unless phone.match(/^[\d]{11}$/)
 
-      response = self.execute __method__, project_guid: self.project_guid,
+      response = self.execute __method__, account_id: self.account_id,
         campaign_guid: campaign_guid,
         phone: phone,
         reference_id: reference_id
@@ -34,13 +34,15 @@ module VCCSystem
       raise "phones and reference_ids should have same size" unless phones.length == reference_ids.length
       count = phones.length
 
-      response = self.execute_post __method__, project_guid: self.project_guid,
-        campaign_guid: campaign_guid,
+      phones = phones.map{ |phone| phone.to_s.gsub(/[^\d]/, '') }
+
+      response = self.execute_post __method__, account_id: self.account_id,
+        campaign_id: campaign_guid,
         phone: phones,
         reference_id: reference_ids
 
       parsed = begin
-        self.parse_response!(response, :xml)
+        self.parse_response!(response)
       rescue RuntimeError => e
         raise "Invalid response for #{__method__} (#{e.message})"
       end
@@ -49,7 +51,7 @@ module VCCSystem
     end
 
     def vcc_lead_del(lead_guid, campaign_guid)
-      response = self.execute __method__, project_guid: self.project_guid,
+      response = self.execute __method__, account_id: self.account_id,
         guid: lead_guid, campaign_guid: campaign_guid
 
       parsed = begin
@@ -62,8 +64,8 @@ module VCCSystem
     end
 
     def vcc_lead_status(campaign_guid)
-      response = self.execute __method__, project_guid: self.project_guid,
-        campaign_guid: campaign_guid
+      response = self.execute __method__, account_id: self.account_id,
+        campaign_id: campaign_guid
 
       begin
         self.parse_response!(response)

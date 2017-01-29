@@ -12,7 +12,7 @@ New client:
 
 ```
 VCCSystem.configure do |config|
-  config.project_guid = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
+  config.account_id = 'a0b1c2d3-e4f5-a0b1-c2d3-e4f5a0b1c2d3'
   config.api_token = a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3e4f5a0b1
 end
 @client = VCCSystem::APIClient.new

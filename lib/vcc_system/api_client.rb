@@ -19,7 +19,7 @@ module VCCSystem
     attr_accessor :port
     attr_accessor :path
     attr_accessor :debug
-    attr_accessor :project_guid
+    attr_accessor :account_id
     attr_accessor :caller_id
     attr_accessor :api_token
     attr_accessor :logger
@@ -37,7 +37,7 @@ module VCCSystem
       self.port = options[:port] || config.port
       self.path = options[:path] || config.path
       self.debug = options[:debug] || config.debug
-      self.project_guid = options[:project_guid] || config.project_guid
+      self.account_id = options[:account_id] || config.account_id
       self.caller_id = options[:caller_id] || config.caller_id
       self.api_token = options[:api_token] || config.api_token
       self.logger = options[:logger] || Logger.new(STDOUT)
