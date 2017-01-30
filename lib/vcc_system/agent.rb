@@ -52,8 +52,12 @@ module VCCSystem
       uri = self.get_api_uri
       uri.path = "#{self.path}/#{__method__}.php"
       uri.query_values = {
-        agent: agent, campaign: campaign, project: self.account_id,
-        vcc: self.host, crm: crm
+        account_id: self.account_id,
+        agent: agent,
+        campaign_id: campaign,
+        project: self.account_id,
+        vcc: self.host,
+        crm: crm
       }
       uri.normalize.to_s
     end

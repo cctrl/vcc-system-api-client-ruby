@@ -11,7 +11,6 @@ module VCCSystem
     }
 
     def vcc_campaign_add(name)
-      byebug
       response = self.execute __method__, account_id: self.account_id,
         name: name,
         campaign_type: CAMPAIGN_TYPE_OUTBOUND,
