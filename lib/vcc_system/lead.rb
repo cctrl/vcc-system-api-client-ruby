@@ -12,7 +12,7 @@ module VCCSystem
       raise "Phone number format required: 1XXXXXXXXXX" unless phone.match(/^[\d]{11}$/)
 
       response = self.execute __method__, account_id: self.account_id,
-        campaign_guid: campaign_guid,
+        campaign_id: campaign_guid,
         phone: phone,
         reference_id: reference_id
 
