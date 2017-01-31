@@ -23,7 +23,8 @@ module VCCSystem
         raise "Invalid response for #{__method__} (#{e.message})"
       end
 
-      return parsed[:campaign_guid] if parsed[:status] == "0"
+
+      return parsed.fetch(:campaign_id) if parsed[:status] == "0"
 
       raise(CAMPAIGN_ADD_ERRORS[(parsed[:status])] || "Failed (status: #{parsed[:status]})")
     end
